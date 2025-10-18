@@ -91,9 +91,9 @@ const ChildDrawings = ({ childId, childName }: ChildDrawingsProps) => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm font-semibold text-primary">
                     <Heart className="w-4 h-4" />
-                    Emotional Insight
+                    Psychological Insight
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed bg-white/50 p-3 rounded-lg">
+                  <p className="text-sm text-foreground leading-relaxed bg-gradient-to-br from-primary/5 to-secondary/5 p-4 rounded-lg border border-primary/10">
                     {drawing.ai_analysis}
                   </p>
                 </div>
