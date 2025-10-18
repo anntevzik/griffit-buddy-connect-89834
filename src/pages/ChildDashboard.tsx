@@ -5,7 +5,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { LogOut, Sparkles } from "lucide-react";
 import EmotionPlayground from "@/components/child/EmotionPlayground";
-import CalmCorner from "@/components/child/CalmCorner";
 import ProgressGarden from "@/components/child/ProgressGarden";
 import ChoiceExplorer from "@/components/child/ChoiceExplorer";
 import CreativeHub from "@/components/child/CreativeHub";
@@ -118,12 +117,7 @@ const ChildDashboard = () => {
           {/* Row 3 */}
           <ParentLink childId={childData?.id} currentParentId={childData?.parent_id} />
           
-          {/* Row 4 */}
-          <div className="lg:col-span-2">
-            <CalmCorner childId={childData?.id} />
-          </div>
-          
-          {/* Row 5 - Full Width */}
+          {/* Row 4 - Full Width */}
           <div className="lg:col-span-2">
             <CreativeHub childId={childData?.id} />
           </div>
