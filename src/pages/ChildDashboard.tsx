@@ -12,6 +12,7 @@ import CreativeHub from "@/components/child/CreativeHub";
 import GriffitCompanion from "@/components/child/GriffitCompanion";
 import ParentLink from "@/components/child/ParentLink";
 import type { User } from "@supabase/supabase-js";
+import griffithLogo from "@/assets/griffith-logo.png";
 
 const ChildDashboard = () => {
   const navigate = useNavigate();
@@ -80,13 +81,16 @@ const ChildDashboard = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <div className="animate-fade-in-up">
-            <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">
-              Hi, {childData?.child_name}! 👋
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              Welcome to your Griffit World
-            </p>
+          <div className="flex items-center gap-6 animate-fade-in-up">
+            <img src={griffithLogo} alt="Griffith Logo" className="w-20 h-20 md:w-24 md:h-24 object-contain" />
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                Hi, {childData?.child_name}! 👋
+              </h1>
+              <p className="text-xl text-muted-foreground">
+                Welcome to your Griffit World
+              </p>
+            </div>
           </div>
           <Button
             onClick={handleLogout}

@@ -9,6 +9,7 @@ import EmotionalInsights from "@/components/parent/EmotionalInsights";
 import ParentBadges from "@/components/parent/ParentBadges";
 import FoodChoices from "@/components/parent/FoodChoices";
 import type { User } from "@supabase/supabase-js";
+import griffithLogo from "@/assets/griffith-logo.png";
 
 const ParentDashboard = () => {
   const navigate = useNavigate();
@@ -86,13 +87,16 @@ const ParentDashboard = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <div className="animate-fade-in-up">
-            <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">
-              Welcome, {parentData?.full_name}
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              Your Insight Hub
-            </p>
+          <div className="flex items-center gap-6 animate-fade-in-up">
+            <img src={griffithLogo} alt="Griffith Logo" className="w-20 h-20 md:w-24 md:h-24 object-contain" />
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                Welcome, {parentData?.full_name}
+              </h1>
+              <p className="text-xl text-muted-foreground">
+                Your Insight Hub
+              </p>
+            </div>
           </div>
           <Button
             onClick={handleLogout}
