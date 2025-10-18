@@ -9,7 +9,7 @@ import CalmCorner from "@/components/child/CalmCorner";
 import ProgressGarden from "@/components/child/ProgressGarden";
 import ChoiceExplorer from "@/components/child/ChoiceExplorer";
 import CreativeHub from "@/components/child/CreativeHub";
-import GriffitCompanion from "@/components/child/GriffitCompanion";
+import GriffinCompanion from "@/components/child/GriffinCompanion";
 import ParentLink from "@/components/child/ParentLink";
 import type { User } from "@supabase/supabase-js";
 import griffithLogo from "@/assets/griffin-logo.png";
@@ -88,7 +88,7 @@ const ChildDashboard = () => {
                 Hi, {childData?.child_name}! 👋
               </h1>
               <p className="text-xl text-muted-foreground">
-                Welcome to your Griffit World
+                Welcome to your Griffin World
               </p>
             </div>
           </div>
@@ -106,7 +106,7 @@ const ChildDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Row 1 */}
           <EmotionPlayground childId={childData?.id} />
-          <GriffitCompanion childName={childData?.child_name} />
+          <GriffinCompanion childName={childData?.child_name} />
           
           {/* Row 2 */}
           <ChoiceExplorer childId={childData?.id} />

@@ -127,7 +127,7 @@ const CreativeHub = ({ childId }: CreativeHubProps) => {
     if (!canvas) return;
 
     const link = document.createElement("a");
-    link.download = `griffit-artwork-${Date.now()}.png`;
+    link.download = `griffin-artwork-${Date.now()}.png`;
     link.href = canvas.toDataURL();
     link.click();
 

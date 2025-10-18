@@ -14,7 +14,7 @@ const Auth = () => {
           <div className="flex items-center justify-center gap-3 mb-4">
             <Heart className="w-12 h-12 text-primary animate-gentle-bounce" />
             <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Griffit
+              Griffin
             </h1>
             <Sparkles className="w-12 h-12 text-secondary animate-gentle-bounce" style={{ animationDelay: "0.2s" }} />
           </div>

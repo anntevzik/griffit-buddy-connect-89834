@@ -34,7 +34,7 @@ const Index = () => {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[hsl(var(--calm-lavender)_/_0.2)] via-[hsl(var(--gentle-cream))] to-[hsl(var(--soft-mint)_/_0.2)]">
       <div className="text-center">
         <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
-        <p className="text-xl text-muted-foreground">Loading Griffit...</p>
+        <p className="text-xl text-muted-foreground">Loading Griffin...</p>
       </div>
     </div>
   );

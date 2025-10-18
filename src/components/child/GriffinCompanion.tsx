@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heart, Sparkles, Sun, Moon } from "lucide-react";
 
-interface GriffitCompanionProps {
+interface GriffinCompanionProps {
   childName: string;
 }
 
@@ -18,7 +18,7 @@ const companionPhrases = [
   "You're safe here 💚",
 ];
 
-const GriffitCompanion = ({ childName }: GriffitCompanionProps) => {
+const GriffinCompanion = ({ childName }: GriffinCompanionProps) => {
   const [currentPhrase, setCurrentPhrase] = useState(companionPhrases[0]);
   const [mood, setMood] = useState<"happy" | "calm" | "thinking">("happy");
 
@@ -67,7 +67,7 @@ const GriffitCompanion = ({ childName }: GriffitCompanionProps) => {
       <div className="text-center space-y-6">
         <div className="mb-4">
           <h2 className="text-2xl font-bold text-primary mb-2">
-            Your Griffit Friend
+            Your Griffin Friend
           </h2>
           <p className="text-muted-foreground">
             I'm always here for you, {childName}! 💙
@@ -123,4 +123,4 @@ const GriffitCompanion = ({ childName }: GriffitCompanionProps) => {
   );
 };
 
-export default GriffitCompanion;
+export default GriffinCompanion;

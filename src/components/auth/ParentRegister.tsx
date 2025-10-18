@@ -56,7 +56,7 @@ const ParentRegister = () => {
       if (authError) throw authError;
 
       toast({
-        title: "Welcome to Griffit!",
+        title: "Welcome to Griffin!",
         description: "Your parent account has been created successfully.",
       });
 
