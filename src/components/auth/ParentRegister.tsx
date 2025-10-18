@@ -41,23 +41,19 @@ const ParentRegister = () => {
 
     try {
       // Sign up the user with metadata (trigger will create parent profile)
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            user_type: 'parent',
             full_name: fullName,
+            user_type: 'parent',
           },
         },
       });
 
       if (authError) throw authError;
-
-      if (!authData.user) {
-        throw new Error("User creation failed");
-      }
 
       toast({
         title: "Welcome to Griffit!",

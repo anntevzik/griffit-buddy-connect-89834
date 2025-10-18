@@ -41,7 +41,7 @@ const ChildRegister = () => {
 
     try {
       // Sign up the user with metadata (trigger will create child profile)
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -55,10 +55,6 @@ const ChildRegister = () => {
       });
 
       if (authError) throw authError;
-
-      if (!authData.user) {
-        throw new Error("User creation failed");
-      }
 
       toast({
         title: "Welcome to Griffit! 🎉",
