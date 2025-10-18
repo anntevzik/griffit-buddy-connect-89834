@@ -139,8 +139,8 @@ const ParentDashboard = () => {
           </div>
         )}
         
-        {/* Griffin Chatbot */}
-        <GriffinChatbot />
+        {/* Griffin Chatbot - Show for first child */}
+        {children.length > 0 && <GriffinChatbot childId={children[0].id} />}
       </div>
     </div>
   );

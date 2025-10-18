@@ -6,13 +6,18 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, X, Send, Sparkles } from "lucide-react";
 import griffinLogo from "@/assets/griffin-logo.png";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
-const GriffinChatbot = () => {
+interface GriffinChatbotProps {
+  childId?: string;
+}
+
+const GriffinChatbot = ({ childId }: GriffinChatbotProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: "Hi there! I'm Griffin, your friendly companion! 🌟 How are you feeling today?" }
@@ -21,6 +26,54 @@ const GriffinChatbot = () => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  
+  useEffect(() => {
+    if (!childId) return;
+
+    // Load existing messages
+    loadMessages();
+
+    // Subscribe to new messages
+    const channel = supabase
+      .channel('chat_messages_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'chat_messages',
+          filter: `child_id=eq.${childId}`,
+        },
+        (payload) => {
+          const newMsg = payload.new as any;
+          setMessages((prev) => {
+            // Avoid duplicates
+            if (prev.some((m) => m.content === newMsg.content)) return prev;
+            return [...prev, { role: newMsg.role, content: newMsg.content }];
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [childId]);
+
+  const loadMessages = async () => {
+    if (!childId) return;
+    
+    const { data } = await supabase
+      .from('chat_messages')
+      .select('*')
+      .eq('child_id', childId)
+      .order('created_at', { ascending: true });
+
+    if (data) {
+      setMessages(data.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })));
+    }
+  };
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -32,6 +85,15 @@ const GriffinChatbot = () => {
     const newMessages = [...messages, { role: "user" as const, content: userMessage }];
     setMessages(newMessages);
     setIsLoading(true);
+
+    // Save user message to database
+    if (childId) {
+      await supabase.from('chat_messages').insert({
+        child_id: childId,
+        role: 'user',
+        content: userMessage,
+      });
+    }
 
     try {
       const response = await fetch(
@@ -78,6 +140,15 @@ const GriffinChatbot = () => {
             }
           }
         }
+      }
+
+      // Save assistant message to database
+      if (childId && assistantMessage) {
+        await supabase.from('chat_messages').insert({
+          child_id: childId,
+          role: 'assistant',
+          content: assistantMessage,
+        });
       }
     } catch (error) {
       console.error("Chat error:", error);

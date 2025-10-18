@@ -12,6 +12,7 @@ import CreativeHub from "@/components/child/CreativeHub";
 import GriffinCompanion from "@/components/child/GriffinCompanion";
 import ParentLink from "@/components/child/ParentLink";
 import GriffinChatbot from "@/components/GriffinChatbot";
+import MiniGames from "@/components/games/MiniGames";
 import type { User } from "@supabase/supabase-js";
 import griffithLogo from "@/assets/griffin-logo.png";
 
@@ -111,26 +112,29 @@ const ChildDashboard = () => {
           
           {/* Row 2 */}
           <ChoiceExplorer childId={childData?.id} />
-          <ParentLink childId={childData?.id} currentParentId={childData?.parent_id} />
+          <MiniGames />
           
           {/* Row 3 */}
+          <ParentLink childId={childData?.id} currentParentId={childData?.parent_id} />
+          
+          {/* Row 4 */}
           <div className="lg:col-span-2">
             <CalmCorner childId={childData?.id} />
           </div>
           
-          {/* Row 4 - Full Width */}
+          {/* Row 5 - Full Width */}
           <div className="lg:col-span-2">
             <CreativeHub childId={childData?.id} />
           </div>
           
-          {/* Row 5 - Full Width */}
+          {/* Row 6 - Full Width */}
           <div className="lg:col-span-2">
             <ProgressGarden childId={childData?.id} />
           </div>
         </div>
         
         {/* Griffin Chatbot */}
-        <GriffinChatbot />
+        <GriffinChatbot childId={childData?.id} />
       </div>
     </div>
   );
