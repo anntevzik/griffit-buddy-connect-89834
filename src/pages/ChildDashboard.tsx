@@ -82,7 +82,7 @@ const ChildDashboard = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-6 animate-fade-in-up">
-            <img src={griffithLogo} alt="Griffith Logo" className="w-20 h-20 md:w-24 md:h-24 object-contain" />
+            <img src={griffithLogo} alt="Griffin Logo" className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-full" />
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">
                 Hi, {childData?.child_name}! 👋
