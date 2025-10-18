@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import griffitLogo from "@/assets/griffit-logo.png";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const Index = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[hsl(var(--calm-lavender)_/_0.2)] via-[hsl(var(--gentle-cream))] to-[hsl(var(--soft-mint)_/_0.2)]">
       <div className="text-center">
+        <img src={griffitLogo} alt="Griffit" className="w-32 h-32 mx-auto mb-8 animate-fade-in" />
         <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
         <p className="text-xl text-muted-foreground">Loading Griffin...</p>
       </div>
