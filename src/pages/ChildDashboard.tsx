@@ -12,7 +12,7 @@ import CreativeHub from "@/components/child/CreativeHub";
 import GriffitCompanion from "@/components/child/GriffitCompanion";
 import ParentLink from "@/components/child/ParentLink";
 import type { User } from "@supabase/supabase-js";
-import griffithLogo from "@/assets/griffin-logo.png";
+import griffithLogo from "@/assets/griffin-logo-clean.png";
 
 const ChildDashboard = () => {
   const navigate = useNavigate();
