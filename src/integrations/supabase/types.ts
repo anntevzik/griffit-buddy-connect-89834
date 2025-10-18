@@ -215,7 +215,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_parent_id_by_email: {
+        Args: { p_email: string }
+        Returns: string
+      }
     }
     Enums: {
       user_type: "parent" | "child"

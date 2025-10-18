@@ -53,14 +53,11 @@ const ParentLink = ({ childId, currentParentId }: ParentLinkProps) => {
     setLoading(true);
 
     try {
-      // Find parent by email
-      const { data: parent, error: parentError } = await supabase
-        .from("parents")
-        .select("id")
-        .eq("email", parentEmail)
-        .single();
+      // Use security definer function to look up parent by email
+      const { data: parentId, error: rpcError } = await supabase
+        .rpc("get_parent_id_by_email", { p_email: parentEmail });
 
-      if (parentError || !parent) {
+      if (rpcError || !parentId) {
         toast({
           title: "Parent Not Found",
           description: "No parent account found with this email",
@@ -72,7 +69,7 @@ const ParentLink = ({ childId, currentParentId }: ParentLinkProps) => {
       // Update child's parent_id
       const { error: updateError } = await supabase
         .from("children")
-        .update({ parent_id: parent.id })
+        .update({ parent_id: parentId })
         .eq("id", childId);
 
       if (updateError) throw updateError;
