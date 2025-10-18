@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
-import { Heart, Palette } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { supabase } from "@/integrations/supabase/client";
+import { Palette, Heart } from "lucide-react";
 
 interface SharedDrawing {
   id: string;
@@ -58,56 +58,55 @@ const ChildDrawings = ({ childId, childName }: ChildDrawingsProps) => {
     }
   };
 
-  if (drawings.length === 0) {
-    return (
-      <Card className="p-6 bg-gradient-to-br from-accent/10 to-primary/5">
-        <div className="flex items-center gap-3 mb-4">
-          <Palette className="w-6 h-6 text-accent" />
-          <h3 className="text-xl font-bold text-accent">{childName}'s Drawings</h3>
-        </div>
-        <p className="text-muted-foreground">
-          No drawings shared yet. When {childName} shares a drawing, it will appear here with emotional insights! 🎨
-        </p>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="p-6 bg-gradient-to-br from-accent/10 to-primary/5">
+    <Card className="p-6 bg-gradient-to-br from-primary/5 to-secondary/5">
       <div className="flex items-center gap-3 mb-6">
-        <Palette className="w-6 h-6 text-accent" />
-        <h3 className="text-xl font-bold text-accent">{childName}'s Shared Drawings</h3>
+        <Palette className="w-8 h-8 text-primary" />
+        <div>
+          <h2 className="text-2xl font-bold text-primary">{childName}'s Art Gallery</h2>
+          <p className="text-sm text-muted-foreground">See what they're expressing</p>
+        </div>
       </div>
 
       <ScrollArea className="h-[500px] pr-4">
-        <div className="space-y-6">
-          {drawings.map((drawing) => (
-            <Card key={drawing.id} className="p-4 bg-white shadow-md">
-              <div className="space-y-3">
-                <img
-                  src={drawing.image_data}
-                  alt="Child's drawing"
-                  className="w-full rounded-lg border-2 border-primary/20"
-                />
-                
-                <div className="bg-accent/10 p-4 rounded-lg">
-                  <div className="flex items-start gap-2 mb-2">
-                    <Heart className="w-5 h-5 text-accent flex-shrink-0 mt-1" />
-                    <div>
-                      <p className="font-semibold text-accent mb-1">Emotional Insights:</p>
-                      <p className="text-foreground">{drawing.ai_analysis}</p>
-                    </div>
-                  </div>
+        {drawings.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            <Palette className="w-16 h-16 mx-auto mb-4 opacity-50" />
+            <p>No drawings shared yet</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {drawings.map((drawing) => (
+              <Card key={drawing.id} className="p-4 space-y-4 hover:shadow-lg transition-shadow">
+                {/* Drawing Image */}
+                <div className="bg-white rounded-lg p-2">
+                  <img
+                    src={drawing.image_data}
+                    alt="Child's drawing"
+                    className="w-full rounded border-2 border-gray-200"
+                  />
                 </div>
 
+                {/* AI Analysis */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                    <Heart className="w-4 h-4" />
+                    Emotional Insight
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed bg-white/50 p-3 rounded-lg">
+                    {drawing.ai_analysis}
+                  </p>
+                </div>
+
+                {/* Timestamp */}
                 <p className="text-xs text-muted-foreground">
-                  {new Date(drawing.created_at).toLocaleDateString()} at{' '}
+                  Shared {new Date(drawing.created_at).toLocaleDateString()} at{' '}
                   {new Date(drawing.created_at).toLocaleTimeString()}
                 </p>
-              </div>
-            </Card>
-          ))}
-        </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </ScrollArea>
     </Card>
   );

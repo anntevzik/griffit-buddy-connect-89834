@@ -146,23 +146,24 @@ const CreativeHub = ({ childId }: CreativeHubProps) => {
     try {
       const imageData = canvas.toDataURL();
 
-      // Call edge function to analyze drawing
-      const { data, error } = await supabase.functions.invoke('analyze-drawing', {
-        body: { imageData }
-      });
+      // Get AI analysis
+      const { data: analysisData, error: analysisError } = await supabase.functions.invoke(
+        'analyze-drawing',
+        { body: { imageData } }
+      );
 
-      if (error) throw error;
+      if (analysisError) throw analysisError;
 
-      // Save to database with AI analysis
+      // Save to shared_drawings
       await supabase.from('shared_drawings').insert({
         child_id: childId,
         image_data: imageData,
-        ai_analysis: data.analysis
+        ai_analysis: analysisData.analysis,
       });
 
       toast({
-        title: "Sent to Parent! 💌",
-        description: "Your drawing and feelings are shared with your parent!",
+        title: "Sent to Parent! 💙",
+        description: "Your parent can now see your beautiful drawing!",
       });
     } catch (error) {
       console.error('Error sending drawing:', error);
@@ -267,7 +268,7 @@ const CreativeHub = ({ childId }: CreativeHubProps) => {
         <Button 
           onClick={sendToParent} 
           disabled={isSending}
-          className="rounded-xl h-12 bg-secondary text-secondary-foreground hover:bg-secondary/90"
+          className="rounded-xl h-12 bg-secondary hover:bg-secondary/90"
         >
           <Send className="w-5 h-5 mr-2" />
           {isSending ? "Sending..." : "Send to Parent"}
