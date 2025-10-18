@@ -258,6 +258,30 @@ export type Database = {
           },
         ]
       }
+      shared_drawings: {
+        Row: {
+          ai_analysis: string
+          child_id: string
+          created_at: string
+          id: string
+          image_data: string
+        }
+        Insert: {
+          ai_analysis: string
+          child_id: string
+          created_at?: string
+          id?: string
+          image_data: string
+        }
+        Update: {
+          ai_analysis?: string
+          child_id?: string
+          created_at?: string
+          id?: string
+          image_data?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

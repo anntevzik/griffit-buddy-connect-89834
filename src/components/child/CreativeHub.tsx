@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Palette, Eraser, Download, Trash2, Sparkles } from "lucide-react";
+import { Palette, Eraser, Download, Trash2, Sparkles, Send } from "lucide-react";
 
 interface CreativeHubProps {
   childId: string;
@@ -27,6 +27,7 @@ const CreativeHub = ({ childId }: CreativeHubProps) => {
   const [currentColor, setCurrentColor] = useState(colors[0].value);
   const [brushSize, setBrushSize] = useState(5);
   const [isEraser, setIsEraser] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -137,6 +138,44 @@ const CreativeHub = ({ childId }: CreativeHubProps) => {
     });
   };
 
+  const sendToParent = async () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    setIsSending(true);
+    try {
+      const imageData = canvas.toDataURL();
+
+      // Call edge function to analyze drawing
+      const { data, error } = await supabase.functions.invoke('analyze-drawing', {
+        body: { imageData }
+      });
+
+      if (error) throw error;
+
+      // Save to database with AI analysis
+      await supabase.from('shared_drawings').insert({
+        child_id: childId,
+        image_data: imageData,
+        ai_analysis: data.analysis
+      });
+
+      toast({
+        title: "Sent to Parent! 💌",
+        description: "Your drawing and feelings are shared with your parent!",
+      });
+    } catch (error) {
+      console.error('Error sending drawing:', error);
+      toast({
+        title: "Oops!",
+        description: "Couldn't send to parent. Try again!",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <Card className="p-6 glass-effect shadow-[var(--shadow-float)] border-2 animate-fade-in-up">
       <div className="mb-6">
@@ -200,7 +239,7 @@ const CreativeHub = ({ childId }: CreativeHubProps) => {
       </div>
 
       {/* Tools */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <Button
           onClick={() => setIsEraser(!isEraser)}
           variant={isEraser ? "default" : "outline"}
@@ -223,6 +262,15 @@ const CreativeHub = ({ childId }: CreativeHubProps) => {
         <Button onClick={downloadArtwork} variant="outline" className="rounded-xl h-12">
           <Download className="w-5 h-5 mr-2" />
           Download
+        </Button>
+
+        <Button 
+          onClick={sendToParent} 
+          disabled={isSending}
+          className="rounded-xl h-12 bg-secondary text-secondary-foreground hover:bg-secondary/90"
+        >
+          <Send className="w-5 h-5 mr-2" />
+          {isSending ? "Sending..." : "Send to Parent"}
         </Button>
       </div>
     </Card>
