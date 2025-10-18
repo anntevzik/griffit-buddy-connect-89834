@@ -13,8 +13,11 @@ const SleepReminderNotification = ({ childId }: SleepReminderNotificationProps) 
   const [bedtime, setBedtime] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!childId) return;
+    
     loadSettings();
-    const interval = setInterval(checkBedtime, 60000); // Check every minute
+    checkBedtime(); // Check immediately on mount
+    const interval = setInterval(checkBedtime, 30000); // Check every 30 seconds
 
     // Subscribe to settings changes
     const channel = supabase
@@ -40,29 +43,39 @@ const SleepReminderNotification = ({ childId }: SleepReminderNotificationProps) 
   }, [childId]);
 
   const loadSettings = async () => {
+    if (!childId) return;
+    
     const { data } = await supabase
       .from('sleep_settings')
       .select('*')
       .eq('child_id', childId)
-      .single();
+      .maybeSingle();
 
     if (data && data.enabled) {
       setBedtime(data.bedtime);
-      checkBedtime(data.bedtime);
     } else {
       setBedtime(null);
     }
   };
 
-  const checkBedtime = (time?: string) => {
-    const timeToCheck = time || bedtime;
-    if (!timeToCheck) return;
+  const checkBedtime = () => {
+    if (!bedtime) return;
 
     const now = new Date();
-    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    const bedtimeStr = timeToCheck.slice(0, 5); // HH:MM
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    
+    // Parse bedtime (HH:MM:SS or HH:MM)
+    const bedtimeParts = bedtime.split(':');
+    const bedtimeHour = parseInt(bedtimeParts[0]);
+    const bedtimeMinute = parseInt(bedtimeParts[1]);
 
-    if (currentTime === bedtimeStr) {
+    // Show notification if within 5 minutes of bedtime
+    const currentTotalMinutes = currentHour * 60 + currentMinute;
+    const bedtimeTotalMinutes = bedtimeHour * 60 + bedtimeMinute;
+    const difference = currentTotalMinutes - bedtimeTotalMinutes;
+
+    if (difference >= 0 && difference <= 5) {
       setShowReminder(true);
       
       // Auto-hide after 5 minutes
