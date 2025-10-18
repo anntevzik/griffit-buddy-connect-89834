@@ -8,6 +8,7 @@ import DailyOverview from "@/components/parent/DailyOverview";
 import EmotionalInsights from "@/components/parent/EmotionalInsights";
 import ParentBadges from "@/components/parent/ParentBadges";
 import FoodChoices from "@/components/parent/FoodChoices";
+import GriffinChatbot from "@/components/GriffinChatbot";
 import type { User } from "@supabase/supabase-js";
 import griffithLogo from "@/assets/griffin-logo.png";
 
@@ -137,6 +138,9 @@ const ParentDashboard = () => {
             </p>
           </div>
         )}
+        
+        {/* Griffin Chatbot */}
+        <GriffinChatbot />
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ import ChoiceExplorer from "@/components/child/ChoiceExplorer";
 import CreativeHub from "@/components/child/CreativeHub";
 import GriffinCompanion from "@/components/child/GriffinCompanion";
 import ParentLink from "@/components/child/ParentLink";
+import GriffinChatbot from "@/components/GriffinChatbot";
 import type { User } from "@supabase/supabase-js";
 import griffithLogo from "@/assets/griffin-logo.png";
 
@@ -127,6 +128,9 @@ const ChildDashboard = () => {
             <ProgressGarden childId={childData?.id} />
           </div>
         </div>
+        
+        {/* Griffin Chatbot */}
+        <GriffinChatbot />
       </div>
     </div>
   );
