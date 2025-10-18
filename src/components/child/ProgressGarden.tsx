@@ -35,20 +35,91 @@ const badgeColors: Record<string, string> = {
 const ProgressGarden = ({ childId }: ProgressGardenProps) => {
   const [progressCount, setProgressCount] = useState(0);
   const [badges, setBadges] = useState<Badge[]>([]);
+  const [highScore, setHighScore] = useState(0);
 
   useEffect(() => {
-    fetchProgress();
+    checkAndResetDaily();
     fetchBadges();
   }, [childId]);
 
-  const fetchProgress = async () => {
-    const { data, error } = await supabase
-      .from("progress_entries")
-      .select("*")
-      .eq("child_id", childId);
+  const checkAndResetDaily = async () => {
+    if (!childId) return;
 
-    if (!error && data) {
-      setProgressCount(data.length);
+    // Get or create daily stats
+    const { data: stats } = await supabase
+      .from("daily_garden_stats")
+      .select("*")
+      .eq("child_id", childId)
+      .maybeSingle();
+
+    const today = new Date().toISOString().split('T')[0];
+
+    if (!stats) {
+      // First time - create stats
+      const { data: progressData } = await supabase
+        .from("progress_entries")
+        .select("*")
+        .eq("child_id", childId);
+
+      const currentScore = progressData?.length || 0;
+
+      await supabase.from("daily_garden_stats").insert({
+        child_id: childId,
+        daily_score: currentScore,
+        high_score: currentScore,
+        last_reset_date: today,
+      });
+
+      setProgressCount(currentScore);
+      setHighScore(currentScore);
+    } else {
+      // Check if we need to reset for new day
+      if (stats.last_reset_date !== today) {
+        // New day - update high score if current is higher
+        const { data: progressData } = await supabase
+          .from("progress_entries")
+          .select("*")
+          .eq("child_id", childId);
+
+        const currentScore = progressData?.length || 0;
+        const newHighScore = Math.max(stats.high_score, currentScore);
+
+        // Delete old progress entries
+        await supabase
+          .from("progress_entries")
+          .delete()
+          .eq("child_id", childId);
+
+        // Update stats
+        await supabase
+          .from("daily_garden_stats")
+          .update({
+            daily_score: 0,
+            high_score: newHighScore,
+            last_reset_date: today,
+          })
+          .eq("child_id", childId);
+
+        setProgressCount(0);
+        setHighScore(newHighScore);
+      } else {
+        // Same day - just fetch current progress
+        const { data: progressData } = await supabase
+          .from("progress_entries")
+          .select("*")
+          .eq("child_id", childId);
+
+        const currentScore = progressData?.length || 0;
+
+        // Update daily score
+        await supabase
+          .from("daily_garden_stats")
+          .update({ daily_score: currentScore })
+          .eq("child_id", childId);
+
+        setProgressCount(currentScore);
+        setHighScore(stats.high_score);
+      }
     }
   };
 
@@ -78,15 +149,21 @@ const ProgressGarden = ({ childId }: ProgressGardenProps) => {
         </p>
       </div>
 
-      <div className="mb-6 p-4 bg-accent/20 rounded-xl flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="mb-6 grid grid-cols-2 gap-4">
+        <div className="p-4 bg-accent/20 rounded-xl flex items-center gap-3">
           <Trophy className="w-8 h-8 text-accent" />
           <div>
-            <p className="text-sm text-muted-foreground">Total Activities</p>
+            <p className="text-sm text-muted-foreground">Today's Score</p>
             <p className="text-3xl font-bold text-accent">{progressCount}</p>
           </div>
         </div>
-        <Sparkles className="w-12 h-12 text-accent animate-gentle-bounce" />
+        <div className="p-4 bg-primary/20 rounded-xl flex items-center gap-3">
+          <Award className="w-8 h-8 text-primary" />
+          <div>
+            <p className="text-sm text-muted-foreground">High Score</p>
+            <p className="text-3xl font-bold text-primary">{highScore}</p>
+          </div>
+        </div>
       </div>
 
       <div className="min-h-[200px] p-6 bg-gradient-to-b from-sky-100 to-green-100 rounded-2xl relative overflow-hidden">

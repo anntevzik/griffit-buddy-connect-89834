@@ -167,6 +167,36 @@ export type Database = {
           },
         ]
       }
+      daily_garden_stats: {
+        Row: {
+          child_id: string
+          created_at: string
+          daily_score: number
+          high_score: number
+          id: string
+          last_reset_date: string
+          updated_at: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          daily_score?: number
+          high_score?: number
+          id?: string
+          last_reset_date?: string
+          updated_at?: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          daily_score?: number
+          high_score?: number
+          id?: string
+          last_reset_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       emotion_logs: {
         Row: {
           child_id: string
