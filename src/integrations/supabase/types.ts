@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          badge_type: string
+          child_id: string
+          created_at: string
+          id: string
+          message: string
+        }
+        Insert: {
+          badge_type: string
+          child_id: string
+          created_at?: string
+          id?: string
+          message: string
+        }
+        Update: {
+          badge_type?: string
+          child_id?: string
+          created_at?: string
+          id?: string
+          message?: string
+        }
+        Relationships: []
+      }
       children: {
         Row: {
           avatar_type: string | null

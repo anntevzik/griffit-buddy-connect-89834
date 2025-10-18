@@ -40,14 +40,14 @@ const ParentBadges = ({ childId, childName }: ParentBadgesProps) => {
     setSending(true);
 
     try {
-      // Log as a special progress entry that appears in child's garden
-      await supabase.from("progress_entries").insert({
+      // Insert badge into badges table
+      const { error: badgeError } = await supabase.from("badges").insert({
         child_id: childId,
-        activity_type: `parent_badge_${selectedBadge.type}`,
+        badge_type: selectedBadge.type,
+        message: message.trim(),
       });
 
-      // Could also create a separate badges table in the future
-      // For now, this adds to their progress garden
+      if (badgeError) throw badgeError;
 
       toast({
         title: "Badge sent! 🎉",
