@@ -18,7 +18,7 @@ const Index = () => {
         .from("parents")
         .select("id")
         .eq("user_id", session.user.id)
-        .single();
+        .maybeSingle();
 
       if (parentData) {
         navigate("/parent-dashboard");

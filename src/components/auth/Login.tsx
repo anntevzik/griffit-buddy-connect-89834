@@ -42,7 +42,7 @@ const Login = () => {
         .from("parents")
         .select("id")
         .eq("user_id", data.user.id)
-        .single();
+        .maybeSingle();
 
       if (parentData) {
         navigate("/parent-dashboard");
