@@ -9,6 +9,7 @@ import EmotionalInsights from "@/components/parent/EmotionalInsights";
 import ParentBadges from "@/components/parent/ParentBadges";
 import FoodChoices from "@/components/parent/FoodChoices";
 import ChildDrawings from "@/components/parent/ChildDrawings";
+import SleepReminderSettings from "@/components/parent/SleepReminderSettings";
 import GriffinChatbot from "@/components/GriffinChatbot";
 import type { User } from "@supabase/supabase-js";
 import griffithLogo from "@/assets/griffin-logo.png";
@@ -124,6 +125,9 @@ const ParentDashboard = () => {
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <ParentBadges childId={child.id} childName={child.child_name} />
+                  <SleepReminderSettings childId={child.id} childName={child.child_name} />
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <FoodChoices childId={child.id} childName={child.child_name} />
                 </div>
                 <div className="grid grid-cols-1 gap-6">

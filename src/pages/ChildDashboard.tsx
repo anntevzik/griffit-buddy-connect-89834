@@ -13,6 +13,7 @@ import GriffinCompanion from "@/components/child/GriffinCompanion";
 import ParentLink from "@/components/child/ParentLink";
 import GriffinChatbot from "@/components/GriffinChatbot";
 import MiniGames from "@/components/games/MiniGames";
+import SleepReminderNotification from "@/components/child/SleepReminderNotification";
 import type { User } from "@supabase/supabase-js";
 import griffithLogo from "@/assets/griffin-logo.png";
 
@@ -132,6 +133,9 @@ const ChildDashboard = () => {
             <ProgressGarden childId={childData?.id} />
           </div>
         </div>
+        
+        {/* Sleep Reminder Notification */}
+        <SleepReminderNotification childId={childData?.id} />
         
         {/* Griffin Chatbot */}
         <GriffinChatbot childId={childData?.id} />

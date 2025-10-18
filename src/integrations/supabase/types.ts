@@ -282,6 +282,33 @@ export type Database = {
         }
         Relationships: []
       }
+      sleep_settings: {
+        Row: {
+          bedtime: string
+          child_id: string
+          created_at: string
+          enabled: boolean
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          bedtime?: string
+          child_id: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          bedtime?: string
+          child_id?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
