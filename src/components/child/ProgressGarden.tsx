@@ -1,17 +1,44 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Flower2, Sparkles, Trophy } from "lucide-react";
+import { Flower2, Sparkles, Trophy, Award, Heart, Star, Zap } from "lucide-react";
 
 interface ProgressGardenProps {
   childId: string;
 }
 
+interface Badge {
+  id: string;
+  badge_type: string;
+  message: string;
+  created_at: string;
+}
+
+const badgeIcons: Record<string, any> = {
+  star: Star,
+  heart: Heart,
+  trophy: Trophy,
+  sparkles: Sparkles,
+  zap: Zap,
+  award: Award,
+};
+
+const badgeColors: Record<string, string> = {
+  star: "bg-yellow-300",
+  heart: "bg-pink-300",
+  trophy: "bg-amber-300",
+  sparkles: "bg-purple-300",
+  zap: "bg-blue-300",
+  award: "bg-green-300",
+};
+
 const ProgressGarden = ({ childId }: ProgressGardenProps) => {
   const [progressCount, setProgressCount] = useState(0);
+  const [badges, setBadges] = useState<Badge[]>([]);
 
   useEffect(() => {
     fetchProgress();
+    fetchBadges();
   }, [childId]);
 
   const fetchProgress = async () => {
@@ -22,6 +49,19 @@ const ProgressGarden = ({ childId }: ProgressGardenProps) => {
 
     if (!error && data) {
       setProgressCount(data.length);
+    }
+  };
+
+  const fetchBadges = async () => {
+    const { data, error } = await supabase
+      .from("badges")
+      .select("*")
+      .eq("child_id", childId)
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    if (!error && data) {
+      setBadges(data);
     }
   };
 
@@ -92,6 +132,40 @@ const ProgressGarden = ({ childId }: ProgressGardenProps) => {
           </div>
         )}
       </div>
+
+      {/* Badges from Parents */}
+      {badges.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-2xl font-bold text-primary mb-4 flex items-center gap-2">
+            💝 Messages from Your Parent
+          </h3>
+          <div className="space-y-3">
+            {badges.map((badge) => {
+              const Icon = badgeIcons[badge.badge_type] || Award;
+              const colorClass = badgeColors[badge.badge_type] || "bg-primary";
+              
+              return (
+                <div
+                  key={badge.id}
+                  className="p-4 glass-effect rounded-xl animate-fade-in-up flex items-center gap-4 border-2 border-primary/20"
+                >
+                  <div className={`w-16 h-16 rounded-full ${colorClass} flex items-center justify-center shadow-lg flex-shrink-0`}>
+                    <Icon className="w-8 h-8 text-gray-800" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-lg font-medium text-foreground">
+                      {badge.message}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {new Date(badge.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </Card>
   );
 };
