@@ -5,12 +5,14 @@ import Login from "@/components/auth/Login";
 import ParentRegister from "@/components/auth/ParentRegister";
 import ChildRegister from "@/components/auth/ChildRegister";
 import { Sparkles, Heart } from "lucide-react";
+import griffitLogo from "@/assets/griffit-logo.png";
 
 const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[hsl(var(--calm-lavender)_/_0.2)] via-[hsl(var(--gentle-cream))] to-[hsl(var(--soft-mint)_/_0.2)]">
       <div className="w-full max-w-5xl">
         <div className="text-center mb-8 animate-fade-in-up">
+          <img src={griffitLogo} alt="Griffit" className="w-24 h-24 mx-auto mb-6" />
           <div className="flex items-center justify-center gap-3 mb-4">
             <Heart className="w-12 h-12 text-primary animate-gentle-bounce" />
             <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
