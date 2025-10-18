@@ -10,6 +10,7 @@ import ProgressGarden from "@/components/child/ProgressGarden";
 import ChoiceExplorer from "@/components/child/ChoiceExplorer";
 import CreativeHub from "@/components/child/CreativeHub";
 import GriffitCompanion from "@/components/child/GriffitCompanion";
+import ParentLink from "@/components/child/ParentLink";
 import type { User } from "@supabase/supabase-js";
 
 const ChildDashboard = () => {
@@ -105,14 +106,19 @@ const ChildDashboard = () => {
           
           {/* Row 2 */}
           <ChoiceExplorer childId={childData?.id} />
-          <CalmCorner childId={childData?.id} />
+          <ParentLink childId={childData?.id} currentParentId={childData?.parent_id} />
           
-          {/* Row 3 - Full Width */}
+          {/* Row 3 */}
+          <div className="lg:col-span-2">
+            <CalmCorner childId={childData?.id} />
+          </div>
+          
+          {/* Row 4 - Full Width */}
           <div className="lg:col-span-2">
             <CreativeHub childId={childData?.id} />
           </div>
           
-          {/* Row 4 - Full Width */}
+          {/* Row 5 - Full Width */}
           <div className="lg:col-span-2">
             <ProgressGarden childId={childData?.id} />
           </div>
