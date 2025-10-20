@@ -259,6 +259,39 @@ export type Database = {
         }
         Relationships: []
       }
+      pill_reminders: {
+        Row: {
+          child_id: string
+          created_at: string
+          enabled: boolean
+          id: string
+          notes: string | null
+          pill_name: string
+          reminder_time: string
+          updated_at: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          notes?: string | null
+          pill_name: string
+          reminder_time?: string
+          updated_at?: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          notes?: string | null
+          pill_name?: string
+          reminder_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       progress_entries: {
         Row: {
           activity_type: string
