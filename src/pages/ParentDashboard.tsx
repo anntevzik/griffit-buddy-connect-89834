@@ -11,6 +11,7 @@ import FoodChoices from "@/components/parent/FoodChoices";
 import ChildDrawings from "@/components/parent/ChildDrawings";
 import SleepReminderSettings from "@/components/parent/SleepReminderSettings";
 import PillReminderSettings from "@/components/parent/PillReminderSettings";
+import ChildBehaviorAnalysis from "@/components/parent/ChildBehaviorAnalysis";
 import GriffinChatbot from "@/components/GriffinChatbot";
 import type { User } from "@supabase/supabase-js";
 import griffithLogo from "@/assets/griffin-logo.png";
@@ -120,6 +121,9 @@ const ParentDashboard = () => {
                 <h2 className="text-3xl font-bold text-foreground">
                   {child.child_name}'s Journey
                 </h2>
+                <div className="grid grid-cols-1 gap-6">
+                  <ChildBehaviorAnalysis childId={child.id} childName={child.child_name} />
+                </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <DailyOverview childId={child.id} childName={child.child_name} />
                   <EmotionalInsights childId={child.id} />
