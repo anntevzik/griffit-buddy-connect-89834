@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.1';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,7 +12,72 @@ serve(async (req) => {
   }
 
   try {
-    const { emotionData, foodData, gameData } = await req.json();
+    // Authenticate user
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { emotionData, foodData, gameData, child_id } = await req.json();
+    
+    // Validate input
+    if (!emotionData || !foodData || !gameData) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required data' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!child_id || typeof child_id !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid child_id' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Verify parent has access to this child
+    const { data: childData, error: childError } = await supabaseClient
+      .from('children')
+      .select('parent_id')
+      .eq('id', child_id)
+      .single();
+
+    if (childError || !childData) {
+      return new Response(
+        JSON.stringify({ error: 'Child not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { data: parentData, error: parentError } = await supabaseClient
+      .from('parents')
+      .select('id')
+      .eq('user_id', user.id)
+      .single();
+
+    if (parentError || !parentData || parentData.id !== childData.parent_id) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized access to child data' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
     if (!LOVABLE_API_KEY) {
