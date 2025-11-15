@@ -92,6 +92,7 @@ const ChildBehaviorAnalysis = ({ childId, childName }: ChildBehaviorAnalysisProp
         "analyze-child-behavior",
         {
           body: {
+            child_id: childId,
             emotionData: {
               topEmotion,
               count: emotionCount,
