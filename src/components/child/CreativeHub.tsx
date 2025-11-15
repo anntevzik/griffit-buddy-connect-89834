@@ -149,7 +149,7 @@ const CreativeHub = ({ childId }: CreativeHubProps) => {
       // Get AI analysis
       const { data: analysisData, error: analysisError } = await supabase.functions.invoke(
         'analyze-drawing',
-        { body: { imageData } }
+        { body: { imageData, child_id: childId } }
       );
 
       if (analysisError) throw analysisError;
