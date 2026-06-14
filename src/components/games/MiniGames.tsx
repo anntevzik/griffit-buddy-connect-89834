@@ -75,8 +75,7 @@ const MiniGames = ({ childId }: MiniGamesProps) => {
       try {
         await supabase.from("emotion_logs").insert({
           child_id: childId,
-          emotion: feeling,
-          context: `mini_game:${current}`,
+          emotion_type: feeling,
         });
       } catch {}
     }
