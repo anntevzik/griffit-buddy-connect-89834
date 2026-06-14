@@ -55,11 +55,31 @@ serve(async (req) => {
     // Verify child belongs to authenticated user
     const { data: childData, error: childError } = await supabaseClient
       .from('children')
-      .select('user_id')
+      .select('user_id, parent_id')
       .eq('id', child_id)
       .single();
 
-    if (childError || !childData || childData.user_id !== user.id) {
+    if (childError || !childData) {
+      return new Response(
+        JSON.stringify({ error: 'Child not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Allow access if the authenticated user is the child themselves,
+    // or the parent linked to this child.
+    let authorized = childData.user_id === user.id;
+    if (!authorized && childData.parent_id) {
+      const { data: parentRow } = await supabaseClient
+        .from('parents')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('id', childData.parent_id)
+        .maybeSingle();
+      authorized = !!parentRow;
+    }
+
+    if (!authorized) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized access to child data' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
