@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Gamepad2, Shuffle, Sparkles } from "lucide-react";
+import { Gamepad2, Shuffle, Sparkles, Timer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { GameSessionContext } from "./gameSession";
 import MemoryGame from "./MemoryGame";
 import ColorMatchGame from "./ColorMatchGame";
 import BreathingGame from "./BreathingGame";
@@ -43,6 +45,9 @@ const MiniGames = ({ childId }: MiniGamesProps) => {
   const [disliked, setDisliked] = useState<GameKey[]>([]);
   const [current, setCurrent] = useState<GameKey | null>(null);
   const [askFeeling, setAskFeeling] = useState(false);
+  const [mistakes, setMistakes] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(40);
+  const [sessionId, setSessionId] = useState(0);
 
   useEffect(() => {
     try {
@@ -66,6 +71,41 @@ const MiniGames = ({ childId }: MiniGamesProps) => {
     const next = list[Math.floor(Math.random() * list.length)];
     setCurrent(next.key);
     setAskFeeling(false);
+    setMistakes(0);
+    setTimeLeft(40);
+    setSessionId((s) => s + 1);
+  };
+
+  // 40s timer + auto switch
+  useEffect(() => {
+    if (!current || askFeeling) return;
+    setTimeLeft(40);
+    const interval = setInterval(() => {
+      setTimeLeft((t) => {
+        if (t <= 1) {
+          clearInterval(interval);
+          toast.info("Time's up! Let's try a new game! ⏰");
+          pickRandom(current);
+          return 40;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, askFeeling]);
+
+  const reportMistake = () => {
+    if (!current || askFeeling) return;
+    setMistakes((m) => {
+      const next = m + 1;
+      if (next >= 3) {
+        toast.info("Let's try a different game! 🌈");
+        pickRandom(current);
+        return 0;
+      }
+      return next;
+    });
   };
 
   const finishGame = () => setAskFeeling(true);
@@ -107,10 +147,18 @@ const MiniGames = ({ childId }: MiniGamesProps) => {
           <h2 className="text-2xl font-bold text-primary">Fun Games! 🎮</h2>
         </div>
         {current && !askFeeling && (
-          <Button onClick={finishGame} variant="secondary" className="rounded-full">
-            <Sparkles className="w-4 h-4 mr-2" />
-            I'm done!
-          </Button>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10">
+              <Timer className="w-4 h-4" /> {timeLeft}s
+            </span>
+            <span className="text-sm font-semibold px-3 py-1 rounded-full bg-secondary/20">
+              Mistakes: {mistakes}/3
+            </span>
+            <Button onClick={finishGame} variant="secondary" className="rounded-full">
+              <Sparkles className="w-4 h-4 mr-2" />
+              I'm done!
+            </Button>
+          </div>
         )}
       </div>
 
@@ -145,7 +193,9 @@ const MiniGames = ({ childId }: MiniGamesProps) => {
               {currentGame?.emoji} {currentGame?.label}
             </p>
           </div>
-          <Game />
+          <GameSessionContext.Provider value={{ reportMistake }}>
+            <Game key={sessionId} />
+          </GameSessionContext.Provider>
         </div>
       )}
 
