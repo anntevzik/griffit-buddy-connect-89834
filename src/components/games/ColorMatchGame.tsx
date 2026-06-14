@@ -61,7 +61,7 @@ const ColorMatchGame = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <p className="text-lg font-semibold">Level: {level} · Score: {score}</p>
-        <Button onClick={generateNewRound} variant="outline" size="sm">
+        <Button onClick={() => generateNewRound()} variant="outline" size="sm">
           <Sparkles className="w-4 h-4 mr-2" />
           Skip
         </Button>
