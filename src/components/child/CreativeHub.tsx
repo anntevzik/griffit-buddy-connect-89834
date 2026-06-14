@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,71 +23,133 @@ const colors = [
 const CreativeHub = ({ childId }: CreativeHubProps) => {
   const { toast } = useToast();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isDrawingRef = useRef(false);
+  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
   const [currentColor, setCurrentColor] = useState(colors[0].value);
   const [brushSize, setBrushSize] = useState(5);
   const [isEraser, setIsEraser] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
-  useEffect(() => {
+  // Resize canvas to match displayed size, preserving existing drawing
+  const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const rect = container.getBoundingClientRect();
+    const cssWidth = Math.max(300, Math.floor(rect.width));
+    const cssHeight = Math.floor(cssWidth * 0.6);
+
+    // Save existing
+    const prev = document.createElement("canvas");
+    prev.width = canvas.width;
+    prev.height = canvas.height;
+    const prevCtx = prev.getContext("2d");
+    if (prevCtx && canvas.width > 0 && canvas.height > 0) {
+      prevCtx.drawImage(canvas, 0, 0);
+    }
+
+    canvas.style.width = `${cssWidth}px`;
+    canvas.style.height = `${cssHeight}px`;
+    canvas.width = Math.floor(cssWidth * dpr);
+    canvas.height = Math.floor(cssHeight * dpr);
+
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, cssWidth, cssHeight);
+      if (prev.width > 0) {
+        ctx.drawImage(prev, 0, 0, prev.width, prev.height, 0, 0, cssWidth, cssHeight);
       }
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
     }
   }, []);
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    setIsDrawing(true);
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  useEffect(() => {
+    resizeCanvas();
+    const handler = () => resizeCanvas();
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, [resizeCanvas]);
 
+  const getPos = (e: PointerEvent | React.PointerEvent) => {
+    const canvas = canvasRef.current!;
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-    }
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
-
+  const startDrawing = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    canvas.setPointerCapture(e.pointerId);
+    isDrawingRef.current = true;
+    const { x, y } = getPos(e);
+    lastPointRef.current = { x, y };
 
     const ctx = canvas.getContext("2d");
     if (ctx) {
-      ctx.lineTo(x, y);
       ctx.strokeStyle = isEraser ? "#FFFFFF" : currentColor;
+      ctx.fillStyle = isEraser ? "#FFFFFF" : currentColor;
       ctx.lineWidth = isEraser ? brushSize * 2 : brushSize;
       ctx.lineCap = "round";
-      ctx.stroke();
+      ctx.lineJoin = "round";
+      // Draw a dot for taps
+      ctx.beginPath();
+      ctx.arc(x, y, (isEraser ? brushSize * 2 : brushSize) / 2, 0, Math.PI * 2);
+      ctx.fill();
     }
   };
 
-  const stopDrawing = () => {
-    setIsDrawing(false);
+  const draw = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!isDrawingRef.current) return;
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const { x, y } = getPos(e);
+    const last = lastPointRef.current ?? { x, y };
+
+    ctx.strokeStyle = isEraser ? "#FFFFFF" : currentColor;
+    ctx.lineWidth = isEraser ? brushSize * 2 : brushSize;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(last.x, last.y);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+
+    lastPointRef.current = { x, y };
+  };
+
+  const stopDrawing = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    isDrawingRef.current = false;
+    lastPointRef.current = null;
+    const canvas = canvasRef.current;
+    if (canvas && canvas.hasPointerCapture?.(e.pointerId)) {
+      canvas.releasePointerCapture(e.pointerId);
+    }
   };
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext("2d");
     if (ctx) {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
     }
   };
 
@@ -190,16 +252,16 @@ const CreativeHub = ({ childId }: CreativeHubProps) => {
       </div>
 
       {/* Drawing Canvas */}
-      <div className="mb-6 bg-white rounded-2xl p-4 shadow-inner">
+      <div ref={containerRef} className="mb-6 bg-white rounded-2xl p-4 shadow-inner">
         <canvas
           ref={canvasRef}
-          width={600}
-          height={400}
-          className="border-2 border-dashed border-gray-300 rounded-xl cursor-crosshair w-full"
-          onMouseDown={startDrawing}
-          onMouseMove={draw}
-          onMouseUp={stopDrawing}
-          onMouseLeave={stopDrawing}
+          className="border-2 border-dashed border-gray-300 rounded-xl cursor-crosshair block touch-none"
+          style={{ touchAction: "none" }}
+          onPointerDown={startDrawing}
+          onPointerMove={draw}
+          onPointerUp={stopDrawing}
+          onPointerCancel={stopDrawing}
+          onPointerLeave={stopDrawing}
         />
       </div>
 
