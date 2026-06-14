@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useGameSession } from "./gameSession";
 
 const colors = [
   { name: "Red", hex: "#FF6B6B" },
@@ -18,6 +19,7 @@ const ColorMatchGame = () => {
   const [score, setScore] = useState(0);
   const [options, setOptions] = useState<typeof colors>([]);
   const { toast } = useToast();
+  const { reportMistake } = useGameSession();
 
   useEffect(() => {
     generateNewRound();
@@ -48,6 +50,7 @@ const ColorMatchGame = () => {
         description: "That's not quite right, but keep going!",
         variant: "destructive",
       });
+      reportMistake();
     }
   };
 

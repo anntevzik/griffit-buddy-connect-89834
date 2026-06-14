@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, ThumbsUp, ArrowRight, Star } from "lucide-react";
 import { toast } from "sonner";
+import { useGameSession } from "./gameSession";
 
 const scenarios = [
   {
@@ -48,6 +49,7 @@ const SocialStoryGame = () => {
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [showFeedback, setShowFeedback] = useState<string | null>(null);
+  const { reportMistake } = useGameSession();
 
   const handleChoice = (index: number, isGood: boolean) => {
     setSelectedChoice(index);
@@ -64,6 +66,7 @@ const SocialStoryGame = () => {
       const betterMsg = `A better answer is: ${correctText}. You're learning! 💡`;
       setShowFeedback(betterMsg);
       toast.info(betterMsg);
+      reportMistake();
     }
   };
 

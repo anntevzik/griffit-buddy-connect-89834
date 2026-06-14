@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useGameSession } from "./gameSession";
 
 const EMOJIS = ["🍎", "⭐", "🐶", "🌸", "🎈", "🦋", "🍓", "🐠"];
 
@@ -9,6 +10,7 @@ const CountingGame = () => {
   const [options, setOptions] = useState<number[]>([]);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
   const [score, setScore] = useState(0);
+  const { reportMistake } = useGameSession();
 
   const newRound = () => {
     const n = Math.floor(Math.random() * 9) + 1;
@@ -34,6 +36,7 @@ const CountingGame = () => {
       setTimeout(newRound, 900);
     } else {
       setFeedback("wrong");
+      reportMistake();
     }
   };
 

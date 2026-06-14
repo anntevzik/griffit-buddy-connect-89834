@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useGameSession } from "./gameSession";
 
 const emojis = ["🌟", "🎨", "🌈", "🦋", "🌸", "🎵", "🐠", "🌺"];
 
@@ -12,6 +13,7 @@ const MemoryGame = () => {
   const [matched, setMatched] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const { toast } = useToast();
+  const { reportMistake } = useGameSession();
 
   useEffect(() => {
     initializeGame();
@@ -50,6 +52,7 @@ const MemoryGame = () => {
         }
       } else {
         setTimeout(() => setFlipped([]), 1000);
+        reportMistake();
       }
     }
   };
