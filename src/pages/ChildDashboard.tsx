@@ -135,9 +135,6 @@ const ChildDashboard = () => {
             <ProgressGarden childId={childData?.id} />
           </div>
 
-          {/* Row 7 - Email & Food */}
-          <ChildEmailCard email={user?.email} />
-          <FoodTracker childId={childData?.id} />
         </div>
         
         {/* Sleep Reminder Notification */}
