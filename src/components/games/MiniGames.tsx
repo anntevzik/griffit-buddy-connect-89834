@@ -13,7 +13,13 @@ import CountingGame from "./CountingGame";
 import MathGame from "./MathGame";
 import OddOneOutGame from "./OddOneOutGame";
 import PatternGame from "./PatternGame";
-import { QUIZ_GAMES, makeQuizComponent } from "./quizGames";
+import WhackMoleGame from "./WhackMoleGame";
+import CatchStarsGame from "./CatchStarsGame";
+import BalloonPopGame from "./BalloonPopGame";
+import ReactionGame from "./ReactionGame";
+import FindEmojiGame from "./FindEmojiGame";
+import FruitSortGame from "./FruitSortGame";
+import SimonColorsGame from "./SimonColorsGame";
 
 type GameKey = string;
 
@@ -26,17 +32,16 @@ const BASE_GAMES: { key: GameKey; label: string; emoji: string; Component: React
   { key: "math", label: "Quick Math", emoji: "➕", Component: MathGame },
   { key: "odd", label: "Odd One Out", emoji: "🔍", Component: OddOneOutGame },
   { key: "pattern", label: "Pattern Finder", emoji: "🧩", Component: PatternGame },
+  { key: "whack", label: "Whack-a-Mole", emoji: "🐹", Component: WhackMoleGame },
+  { key: "stars", label: "Catch the Stars", emoji: "⭐", Component: CatchStarsGame },
+  { key: "balloons", label: "Balloon Pop", emoji: "🎈", Component: BalloonPopGame },
+  { key: "reaction", label: "Quick Tap", emoji: "⚡", Component: ReactionGame },
+  { key: "find", label: "Find the Emoji", emoji: "🔎", Component: FindEmojiGame },
+  { key: "sort", label: "Sort It!", emoji: "📦", Component: FruitSortGame },
+  { key: "simon", label: "Color Repeat", emoji: "🎵", Component: SimonColorsGame },
 ];
 
-const GAMES = [
-  ...BASE_GAMES,
-  ...QUIZ_GAMES.map((q) => ({
-    key: q.key,
-    label: q.label,
-    emoji: q.emoji,
-    Component: makeQuizComponent(q.gen),
-  })),
-];
+const GAMES = BASE_GAMES;
 
 interface MiniGamesProps {
   childId?: string;
