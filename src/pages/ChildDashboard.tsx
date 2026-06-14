@@ -13,8 +13,6 @@ import ParentLink from "@/components/child/ParentLink";
 import GriffinChatbot from "@/components/GriffinChatbot";
 import MiniGames from "@/components/games/MiniGames";
 import SleepReminderNotification from "@/components/child/SleepReminderNotification";
-import ChildEmailCard from "@/components/child/ChildEmailCard";
-import FoodTracker from "@/components/child/FoodTracker";
 import type { User } from "@supabase/supabase-js";
 import griffithLogo from "@/assets/griffin-logo.png";
 
@@ -137,9 +135,6 @@ const ChildDashboard = () => {
             <ProgressGarden childId={childData?.id} />
           </div>
 
-          {/* Row 7 - Email & Food */}
-          <ChildEmailCard email={user?.email} />
-          <FoodTracker childId={childData?.id} />
         </div>
         
         {/* Sleep Reminder Notification */}
