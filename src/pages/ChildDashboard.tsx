@@ -106,15 +106,17 @@ const ChildDashboard = () => {
 
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Row 1 */}
+          {/* Row 1 - Fun Games on top */}
+          <div className="lg:col-span-2">
+            <MiniGames childId={childData?.id} />
+          </div>
+
+          {/* Row 2 */}
           <EmotionPlayground childId={childData?.id} />
           <GriffinCompanion childName={childData?.child_name} />
-          
-          {/* Row 2 */}
-          <ChoiceExplorer childId={childData?.id} />
-          <MiniGames />
-          
+
           {/* Row 3 */}
+          <ChoiceExplorer childId={childData?.id} />
           <ParentLink childId={childData?.id} currentParentId={childData?.parent_id} />
           
           {/* Row 4 - Full Width */}

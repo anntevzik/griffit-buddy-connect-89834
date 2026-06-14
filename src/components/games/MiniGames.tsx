@@ -1,75 +1,185 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Gamepad2, Heart, Palette, Brain, PenTool, BookOpen } from "lucide-react";
+import { Gamepad2, Shuffle, Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import MemoryGame from "./MemoryGame";
 import ColorMatchGame from "./ColorMatchGame";
 import BreathingGame from "./BreathingGame";
 import TracingGame from "./TracingGame";
 import SequenceGame from "./SequenceGame";
 import SocialStoryGame from "./SocialStoryGame";
+import BubblePopGame from "./BubblePopGame";
+import CountingGame from "./CountingGame";
 
-const MiniGames = () => {
+type GameKey =
+  | "memory"
+  | "colors"
+  | "breathing"
+  | "tracing"
+  | "sequence"
+  | "social"
+  | "bubbles"
+  | "counting";
+
+const GAMES: { key: GameKey; label: string; emoji: string; Component: React.FC }[] = [
+  { key: "memory", label: "Memory Match", emoji: "🧠", Component: MemoryGame },
+  { key: "colors", label: "Color Match", emoji: "🎨", Component: ColorMatchGame },
+  { key: "breathing", label: "Breathing", emoji: "🌬️", Component: BreathingGame },
+  { key: "tracing", label: "Tracing", emoji: "✏️", Component: TracingGame },
+  { key: "sequence", label: "Sequence", emoji: "🔢", Component: SequenceGame },
+  { key: "social", label: "Social Story", emoji: "📖", Component: SocialStoryGame },
+  { key: "bubbles", label: "Bubble Pop", emoji: "🫧", Component: BubblePopGame },
+  { key: "counting", label: "Counting Fun", emoji: "🍎", Component: CountingGame },
+];
+
+interface MiniGamesProps {
+  childId?: string;
+}
+
+const storageKey = (childId?: string) => `griffin_disliked_games_${childId ?? "anon"}`;
+
+const MiniGames = ({ childId }: MiniGamesProps) => {
+  const [disliked, setDisliked] = useState<GameKey[]>([]);
+  const [current, setCurrent] = useState<GameKey | null>(null);
+  const [askFeeling, setAskFeeling] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey(childId));
+      if (raw) setDisliked(JSON.parse(raw));
+    } catch {}
+  }, [childId]);
+
+  const available = useMemo(
+    () => GAMES.filter((g) => !disliked.includes(g.key)),
+    [disliked]
+  );
+
+  const pickRandom = (exclude?: GameKey) => {
+    const pool = available.filter((g) => g.key !== exclude);
+    const list = pool.length > 0 ? pool : available;
+    if (list.length === 0) {
+      setCurrent(null);
+      return;
+    }
+    const next = list[Math.floor(Math.random() * list.length)];
+    setCurrent(next.key);
+    setAskFeeling(false);
+  };
+
+  const finishGame = () => setAskFeeling(true);
+
+  const recordFeeling = async (feeling: "happy" | "okay" | "sad") => {
+    if (childId) {
+      try {
+        await supabase.from("emotion_logs").insert({
+          child_id: childId,
+          emotion_type: feeling,
+        });
+      } catch {}
+    }
+    if (feeling === "sad" && current) {
+      const next = Array.from(new Set([...disliked, current]));
+      setDisliked(next);
+      try {
+        localStorage.setItem(storageKey(childId), JSON.stringify(next));
+      } catch {}
+    }
+    pickRandom(current ?? undefined);
+  };
+
+  const resetDisliked = () => {
+    setDisliked([]);
+    try {
+      localStorage.removeItem(storageKey(childId));
+    } catch {}
+  };
+
+  const currentGame = GAMES.find((g) => g.key === current);
+  const Game = currentGame?.Component;
+
   return (
     <Card className="p-6 bg-gradient-to-br from-primary/5 to-secondary/5">
-      <div className="flex items-center gap-3 mb-6">
-        <Gamepad2 className="w-8 h-8 text-primary" />
-        <h2 className="text-2xl font-bold text-primary">Fun Games! 🎮</h2>
+      <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+        <div className="flex items-center gap-3">
+          <Gamepad2 className="w-8 h-8 text-primary" />
+          <h2 className="text-2xl font-bold text-primary">Fun Games! 🎮</h2>
+        </div>
+        {current && !askFeeling && (
+          <Button onClick={finishGame} variant="secondary" className="rounded-full">
+            <Sparkles className="w-4 h-4 mr-2" />
+            I'm done!
+          </Button>
+        )}
       </div>
 
-      <Tabs defaultValue="memory" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-6">
-          <TabsTrigger value="memory" className="gap-2">
-            <Brain className="w-4 h-4" />
-            Memory
-          </TabsTrigger>
-          <TabsTrigger value="colors" className="gap-2">
-            <Palette className="w-4 h-4" />
-            Colors
-          </TabsTrigger>
-          <TabsTrigger value="breathing" className="gap-2">
-            <Heart className="w-4 h-4" />
-            Breathe
-          </TabsTrigger>
-          <TabsTrigger value="tracing" className="gap-2">
-            <PenTool className="w-4 h-4" />
-            Trace
-          </TabsTrigger>
-          <TabsTrigger value="sequence" className="gap-2">
-            <Brain className="w-4 h-4" />
-            Sequence
-          </TabsTrigger>
-          <TabsTrigger value="social" className="gap-2">
-            <BookOpen className="w-4 h-4" />
-            Stories
-          </TabsTrigger>
-        </TabsList>
+      {!current && !askFeeling && (
+        <div className="text-center py-12 space-y-4">
+          {available.length === 0 ? (
+            <>
+              <p className="text-lg text-muted-foreground">
+                You've told us all the games made you sad. Let's start fresh!
+              </p>
+              <Button onClick={resetDisliked} size="lg">Reset Games</Button>
+            </>
+          ) : (
+            <>
+              <p className="text-xl">Ready for a surprise game?</p>
+              <Button onClick={() => pickRandom()} size="lg" className="rounded-full text-lg h-14 px-8">
+                <Shuffle className="w-5 h-5 mr-2" />
+                Pick a Random Game!
+              </Button>
+              <p className="text-sm text-muted-foreground">
+                {available.length} game{available.length === 1 ? "" : "s"} available
+              </p>
+            </>
+          )}
+        </div>
+      )}
 
-        <TabsContent value="memory">
-          <MemoryGame />
-        </TabsContent>
+      {current && Game && !askFeeling && (
+        <div className="space-y-4">
+          <div className="text-center">
+            <p className="text-lg font-semibold">
+              {currentGame?.emoji} {currentGame?.label}
+            </p>
+          </div>
+          <Game />
+        </div>
+      )}
 
-        <TabsContent value="colors">
-          <ColorMatchGame />
-        </TabsContent>
-
-        <TabsContent value="breathing">
-          <BreathingGame />
-        </TabsContent>
-
-        <TabsContent value="tracing">
-          <TracingGame />
-        </TabsContent>
-
-        <TabsContent value="sequence">
-          <SequenceGame />
-        </TabsContent>
-
-        <TabsContent value="social">
-          <SocialStoryGame />
-        </TabsContent>
-      </Tabs>
+      {askFeeling && (
+        <div className="text-center py-8 space-y-6">
+          <p className="text-2xl font-bold">How did that game make you feel?</p>
+          <div className="flex justify-center gap-4 flex-wrap">
+            <Button
+              onClick={() => recordFeeling("happy")}
+              className="rounded-full h-20 w-32 text-lg flex-col gap-1 bg-green-500 hover:bg-green-600"
+            >
+              <span className="text-3xl">😊</span>
+              Happy
+            </Button>
+            <Button
+              onClick={() => recordFeeling("okay")}
+              className="rounded-full h-20 w-32 text-lg flex-col gap-1 bg-yellow-500 hover:bg-yellow-600"
+            >
+              <span className="text-3xl">😐</span>
+              Okay
+            </Button>
+            <Button
+              onClick={() => recordFeeling("sad")}
+              className="rounded-full h-20 w-32 text-lg flex-col gap-1 bg-blue-500 hover:bg-blue-600"
+            >
+              <span className="text-3xl">😢</span>
+              Sad
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            If you feel sad, we won't show this game again.
+          </p>
+        </div>
+      )}
     </Card>
   );
 };
