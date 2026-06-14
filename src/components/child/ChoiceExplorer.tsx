@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Apple, Coffee, Sandwich, Cookie, Pizza, IceCream, ShoppingBasket } from "lucide-react";
+import { Apple, Coffee, Sandwich, Cookie, Pizza, IceCream, ShoppingBasket, Carrot, Beef, Fish, Egg, Croissant, Salad, Soup, Cherry, Grape, Banana, Citrus, Drumstick, Milk, Cake, Donut, Popcorn } from "lucide-react";
 
 interface ChoiceExplorerProps {
   childId: string;
@@ -16,6 +16,22 @@ const foodChoices = [
   { type: "pizza", icon: Pizza, label: "Pizza", texture: "chewy", color: "bg-orange-200" },
   { type: "ice-cream", icon: IceCream, label: "Ice Cream", texture: "smooth", color: "bg-pink-200" },
   { type: "juice", icon: Coffee, label: "Juice", texture: "liquid", color: "bg-purple-200" },
+  { type: "carrot", icon: Carrot, label: "Carrot", texture: "crunchy", color: "bg-orange-300" },
+  { type: "salad", icon: Salad, label: "Salad", texture: "crunchy", color: "bg-green-200" },
+  { type: "soup", icon: Soup, label: "Soup", texture: "liquid", color: "bg-amber-100" },
+  { type: "chicken", icon: Drumstick, label: "Chicken", texture: "chewy", color: "bg-yellow-300" },
+  { type: "fish", icon: Fish, label: "Fish", texture: "soft", color: "bg-blue-200" },
+  { type: "beef", icon: Beef, label: "Beef", texture: "chewy", color: "bg-red-300" },
+  { type: "egg", icon: Egg, label: "Egg", texture: "soft", color: "bg-yellow-100" },
+  { type: "croissant", icon: Croissant, label: "Croissant", texture: "soft", color: "bg-amber-300" },
+  { type: "banana", icon: Banana, label: "Banana", texture: "soft", color: "bg-yellow-200" },
+  { type: "grapes", icon: Grape, label: "Grapes", texture: "smooth", color: "bg-purple-300" },
+  { type: "cherry", icon: Cherry, label: "Cherry", texture: "smooth", color: "bg-red-200" },
+  { type: "orange", icon: Citrus, label: "Orange", texture: "smooth", color: "bg-orange-200" },
+  { type: "milk", icon: Milk, label: "Milk", texture: "liquid", color: "bg-slate-100" },
+  { type: "cake", icon: Cake, label: "Cake", texture: "soft", color: "bg-pink-300" },
+  { type: "donut", icon: Donut, label: "Donut", texture: "soft", color: "bg-rose-200" },
+  { type: "popcorn", icon: Popcorn, label: "Popcorn", texture: "crunchy", color: "bg-yellow-100" },
 ];
 
 const ChoiceExplorer = ({ childId }: ChoiceExplorerProps) => {
