@@ -79,6 +79,42 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
+    // Load knowledge base: color meanings + professional drawing analyses
+    const [{ data: colorMeanings }, { data: drawingRefs }] = await Promise.all([
+      supabaseClient.from('color_meanings').select('color_name,hex_value,emotional_meaning,psychological_notes'),
+      supabaseClient.from('drawing_references').select('title,description,professional_analysis,tags,source'),
+    ]);
+
+    const colorsBlock = (colorMeanings ?? [])
+      .map((c: any) => `- ${c.color_name} (${c.hex_value}): ${c.emotional_meaning} | ${c.psychological_notes}`)
+      .join('\n');
+
+    const refsBlock = (drawingRefs ?? [])
+      .map((r: any, i: number) =>
+        `${i + 1}. "${r.title}"\n   აღწერა: ${r.description}\n   ფსიქოლოგის ანალიზი: ${r.professional_analysis}\n   ტეგები: ${(r.tags ?? []).join(', ')}${r.source ? `\n   წყარო: ${r.source}` : ''}`
+      )
+      .join('\n\n');
+
+    const systemPrompt = `You are a child psychologist specializing in art therapy for children with autism. Analyze the child's drawing using the KNOWLEDGE BASE below as your primary reference. Ground your analysis in this professional knowledge rather than general intuition.
+
+=== KNOWLEDGE BASE — COLOR MEANINGS (Art Therapy Literature) ===
+${colorsBlock}
+
+=== KNOWLEDGE BASE — PROFESSIONAL DRAWING ANALYSES (Reference Cases) ===
+${refsBlock}
+
+=== YOUR TASK ===
+1. Identify which colors dominate the drawing and look up their meanings in the COLOR MEANINGS table above.
+2. Identify which reference case(s) from PROFESSIONAL DRAWING ANALYSES most closely match this drawing's composition, color palette, and themes.
+3. Write a warm, empathetic analysis in **Georgian (ქართულად)**, 4-5 sentences:
+   - Name the primary emotions you detect (e.g. სიხარული, შფოთვა, სიმშვიდე, კრეატიულობა, სევდა).
+   - Explain WHY, citing specific colors from the knowledge base and the closest matching reference case by title.
+   - Offer a supportive insight about what the child may be processing.
+   - End with one encouraging observation.
+4. After the analysis, on a new line, add: "📚 დაყრდნობილია: <reference title(s)> + <main color names>"
+
+Use a gentle, professional tone. Never diagnose — only describe likely emotional states.`;
+
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -88,35 +124,13 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { 
-            role: 'user', 
+          { role: 'system', content: systemPrompt },
+          {
+            role: 'user',
             content: [
-              {
-                type: 'text',
-                text: `You are a child psychologist specializing in art therapy for children with autism. Analyze this drawing to understand the child's emotional and psychological state.
-
-Consider:
-- **Colors used**: What emotions do they represent? (warm colors = excitement/anxiety, cool colors = calm/sadness, bright = energy, dark = heaviness)
-- **Shapes and patterns**: Are they chaotic or organized? Sharp or rounded? What does this suggest?
-- **Composition**: Is the drawing centered, scattered, or compressed? Does it fill the space or feel confined?
-- **Pressure and strokes**: Heavy lines suggest intensity, light lines suggest gentleness or uncertainty
-- **Subjects drawn**: What themes or objects appear? What might they symbolize?
-
-Provide a warm, empathetic 3-4 sentence analysis that:
-1. Identifies the primary emotions you sense (e.g., joy, anxiety, calmness, creativity, stress)
-2. Explains why you sense these emotions based on specific elements in the drawing
-3. Offers a supportive insight about what the child might be processing or expressing
-4. Ends with an encouraging observation about their emotional expression
-
-Write in a gentle, professional tone that parents will find insightful and supportive.`
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: imageData
-                }
-              }
-            ]
+              { type: 'text', text: 'გაანალიზე ეს ბავშვის ნახატი ცოდნის ბაზის გამოყენებით.' },
+              { type: 'image_url', image_url: { url: imageData } },
+            ],
           },
         ],
       }),

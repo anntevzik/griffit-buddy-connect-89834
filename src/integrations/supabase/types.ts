@@ -132,6 +132,33 @@ export type Database = {
           },
         ]
       }
+      color_meanings: {
+        Row: {
+          color_name: string
+          created_at: string
+          emotional_meaning: string
+          hex_value: string
+          id: string
+          psychological_notes: string
+        }
+        Insert: {
+          color_name: string
+          created_at?: string
+          emotional_meaning: string
+          hex_value: string
+          id?: string
+          psychological_notes: string
+        }
+        Update: {
+          color_name?: string
+          created_at?: string
+          emotional_meaning?: string
+          hex_value?: string
+          id?: string
+          psychological_notes?: string
+        }
+        Relationships: []
+      }
       creative_works: {
         Row: {
           child_id: string
@@ -194,6 +221,36 @@ export type Database = {
           id?: string
           last_reset_date?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      drawing_references: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          professional_analysis: string
+          source: string | null
+          tags: string[]
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          professional_analysis: string
+          source?: string | null
+          tags?: string[]
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          professional_analysis?: string
+          source?: string | null
+          tags?: string[]
+          title?: string
         }
         Relationships: []
       }
