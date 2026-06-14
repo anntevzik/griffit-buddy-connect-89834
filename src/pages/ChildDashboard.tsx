@@ -126,10 +126,14 @@ const ChildDashboard = () => {
             <CreativeHub childId={childData?.id} />
           </div>
           
-          {/* Row 6 - Full Width */}
+          {/* Row 5 - Full Width */}
           <div className="lg:col-span-2">
             <ProgressGarden childId={childData?.id} />
           </div>
+
+          {/* Row 6 - Email & Food */}
+          <ChildEmailCard email={user?.email} />
+          <FoodTracker childId={childData?.id} />
         </div>
         
         {/* Sleep Reminder Notification */}
