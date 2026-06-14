@@ -5,13 +5,14 @@ import { Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useGameSession } from "./gameSession";
 
-const emojis = ["🌟", "🎨", "🌈", "🦋", "🌸", "🎵", "🐠", "🌺"];
+const ALL_EMOJIS = ["🌟", "🎨", "🌈", "🦋", "🌸", "🎵", "🐠", "🌺", "🍀", "🐝", "🐞", "🌻"];
 
 const MemoryGame = () => {
   const [cards, setCards] = useState<string[]>([]);
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
+  const [level, setLevel] = useState(1);
   const { toast } = useToast();
   const { reportMistake } = useGameSession();
 
@@ -19,8 +20,10 @@ const MemoryGame = () => {
     initializeGame();
   }, []);
 
-  const initializeGame = () => {
-    const shuffled = [...emojis, ...emojis]
+  const initializeGame = (lvl = level) => {
+    const pairCount = Math.min(3 + lvl, ALL_EMOJIS.length);
+    const picked = ALL_EMOJIS.slice(0, pairCount);
+    const shuffled = [...picked, ...picked]
       .sort(() => Math.random() - 0.5);
     setCards(shuffled);
     setFlipped([]);
@@ -49,6 +52,9 @@ const MemoryGame = () => {
             title: "Amazing! 🎉",
             description: `You won in ${moves + 1} moves!`,
           });
+          const next = level + 1;
+          setLevel(next);
+          setTimeout(() => initializeGame(next), 1200);
         }
       } else {
         setTimeout(() => setFlipped([]), 1000);
@@ -60,8 +66,8 @@ const MemoryGame = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <p className="text-lg font-semibold">Moves: {moves}</p>
-        <Button onClick={initializeGame} variant="outline" size="sm">
+        <p className="text-lg font-semibold">Level: {level} · Moves: {moves}</p>
+        <Button onClick={() => initializeGame()} variant="outline" size="sm">
           <Sparkles className="w-4 h-4 mr-2" />
           New Game
         </Button>

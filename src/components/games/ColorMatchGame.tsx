@@ -17,6 +17,7 @@ const colors = [
 const ColorMatchGame = () => {
   const [targetColor, setTargetColor] = useState(colors[0]);
   const [score, setScore] = useState(0);
+  const [level, setLevel] = useState(1);
   const [options, setOptions] = useState<typeof colors>([]);
   const { toast } = useToast();
   const { reportMistake } = useGameSession();
@@ -25,13 +26,13 @@ const ColorMatchGame = () => {
     generateNewRound();
   }, []);
 
-  const generateNewRound = () => {
+  const generateNewRound = (lvl = level) => {
     const target = colors[Math.floor(Math.random() * colors.length)];
     setTargetColor(target);
-    
-    const shuffled = [...colors].sort(() => Math.random() - 0.5).slice(0, 4);
-    if (!shuffled.find(c => c.name === target.name)) {
-      shuffled[Math.floor(Math.random() * 4)] = target;
+    const optCount = Math.min(3 + lvl, colors.length);
+    const shuffled = [...colors].sort(() => Math.random() - 0.5).slice(0, optCount);
+    if (!shuffled.find((c) => c.name === target.name)) {
+      shuffled[Math.floor(Math.random() * optCount)] = target;
     }
     setOptions(shuffled);
   };
@@ -43,7 +44,9 @@ const ColorMatchGame = () => {
         title: "Correct! ✨",
         description: "Great job matching the color!",
       });
-      generateNewRound();
+      const next = level + 1;
+      setLevel(next);
+      generateNewRound(next);
     } else {
       toast({
         title: "Try again! 💙",
@@ -57,7 +60,7 @@ const ColorMatchGame = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <p className="text-lg font-semibold">Score: {score}</p>
+        <p className="text-lg font-semibold">Level: {level} · Score: {score}</p>
         <Button onClick={generateNewRound} variant="outline" size="sm">
           <Sparkles className="w-4 h-4 mr-2" />
           Skip
