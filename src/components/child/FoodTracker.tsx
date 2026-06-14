@@ -57,7 +57,7 @@ const FoodTracker = ({ childId }: FoodTrackerProps) => {
               <button
                 key={food.name}
                 onClick={() => toggleFood(food.name)}
-                className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-200 border-2 ${
+                className={`relative flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-200 border-2 ${
                   isSelected
                     ? "border-primary bg-primary/10 scale-105"
                     : "border-transparent hover:scale-105"
