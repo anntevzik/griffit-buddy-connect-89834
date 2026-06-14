@@ -7,32 +7,32 @@ import { toast } from "sonner";
 import { GameSessionContext } from "./gameSession";
 import MemoryGame from "./MemoryGame";
 import ColorMatchGame from "./ColorMatchGame";
-import BreathingGame from "./BreathingGame";
-import TracingGame from "./TracingGame";
 import SequenceGame from "./SequenceGame";
 import SocialStoryGame from "./SocialStoryGame";
-import BubblePopGame from "./BubblePopGame";
 import CountingGame from "./CountingGame";
+import MathGame from "./MathGame";
+import OddOneOutGame from "./OddOneOutGame";
+import PatternGame from "./PatternGame";
 
 type GameKey =
   | "memory"
   | "colors"
-  | "breathing"
-  | "tracing"
   | "sequence"
   | "social"
-  | "bubbles"
-  | "counting";
+  | "counting"
+  | "math"
+  | "odd"
+  | "pattern";
 
 const GAMES: { key: GameKey; label: string; emoji: string; Component: React.FC }[] = [
   { key: "memory", label: "Memory Match", emoji: "🧠", Component: MemoryGame },
   { key: "colors", label: "Color Match", emoji: "🎨", Component: ColorMatchGame },
-  { key: "breathing", label: "Breathing", emoji: "🌬️", Component: BreathingGame },
-  { key: "tracing", label: "Tracing", emoji: "✏️", Component: TracingGame },
   { key: "sequence", label: "Sequence", emoji: "🔢", Component: SequenceGame },
   { key: "social", label: "Social Story", emoji: "📖", Component: SocialStoryGame },
-  { key: "bubbles", label: "Bubble Pop", emoji: "🫧", Component: BubblePopGame },
   { key: "counting", label: "Counting Fun", emoji: "🍎", Component: CountingGame },
+  { key: "math", label: "Quick Math", emoji: "➕", Component: MathGame },
+  { key: "odd", label: "Odd One Out", emoji: "🔍", Component: OddOneOutGame },
+  { key: "pattern", label: "Pattern Finder", emoji: "🧩", Component: PatternGame },
 ];
 
 interface MiniGamesProps {
