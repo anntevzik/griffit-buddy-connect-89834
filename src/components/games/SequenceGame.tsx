@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Brain, Play, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import { useGameSession } from "./gameSession";
 
 const colors = ["🔴", "🟢", "🔵", "🟡", "🟣", "🟠"];
 
@@ -13,6 +14,7 @@ const SequenceGame = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(3);
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
+  const { reportMistake } = useGameSession();
 
   const startGame = () => {
     const newSequence = Array.from({ length: currentLevel }, () => 
@@ -45,6 +47,7 @@ const SequenceGame = () => {
     if (sequence[newUserSequence.length - 1] !== index) {
       toast.error("Oops! Try again! 🎯");
       setIsPlaying(false);
+      reportMistake();
       return;
     }
 
