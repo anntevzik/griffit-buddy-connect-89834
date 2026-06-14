@@ -117,21 +117,27 @@ const ChildDashboard = () => {
           <EmotionPlayground childId={childData?.id} />
           <GriffinCompanion childName={childData?.child_name} />
 
-          {/* Row 3 */}
-          <ChoiceExplorer childId={childData?.id} />
-          <ParentLink childId={childData?.id} currentParentId={childData?.parent_id} />
-          
-          {/* Row 4 - Full Width */}
+          {/* Row 3 - Choice Explorer full width */}
+          <div className="lg:col-span-2">
+            <ChoiceExplorer childId={childData?.id} />
+          </div>
+
+          {/* Row 4 - Parent Link full width (moved below) */}
+          <div className="lg:col-span-2">
+            <ParentLink childId={childData?.id} currentParentId={childData?.parent_id} />
+          </div>
+
+          {/* Row 5 - Full Width */}
           <div className="lg:col-span-2">
             <CreativeHub childId={childData?.id} />
           </div>
           
-          {/* Row 5 - Full Width */}
+          {/* Row 6 - Full Width */}
           <div className="lg:col-span-2">
             <ProgressGarden childId={childData?.id} />
           </div>
 
-          {/* Row 6 - Email & Food */}
+          {/* Row 7 - Email & Food */}
           <ChildEmailCard email={user?.email} />
           <FoodTracker childId={childData?.id} />
         </div>
