@@ -13,18 +13,11 @@ import CountingGame from "./CountingGame";
 import MathGame from "./MathGame";
 import OddOneOutGame from "./OddOneOutGame";
 import PatternGame from "./PatternGame";
+import { QUIZ_GAMES, makeQuizComponent } from "./quizGames";
 
-type GameKey =
-  | "memory"
-  | "colors"
-  | "sequence"
-  | "social"
-  | "counting"
-  | "math"
-  | "odd"
-  | "pattern";
+type GameKey = string;
 
-const GAMES: { key: GameKey; label: string; emoji: string; Component: React.FC }[] = [
+const BASE_GAMES: { key: GameKey; label: string; emoji: string; Component: React.FC }[] = [
   { key: "memory", label: "Memory Match", emoji: "🧠", Component: MemoryGame },
   { key: "colors", label: "Color Match", emoji: "🎨", Component: ColorMatchGame },
   { key: "sequence", label: "Sequence", emoji: "🔢", Component: SequenceGame },
@@ -33,6 +26,16 @@ const GAMES: { key: GameKey; label: string; emoji: string; Component: React.FC }
   { key: "math", label: "Quick Math", emoji: "➕", Component: MathGame },
   { key: "odd", label: "Odd One Out", emoji: "🔍", Component: OddOneOutGame },
   { key: "pattern", label: "Pattern Finder", emoji: "🧩", Component: PatternGame },
+];
+
+const GAMES = [
+  ...BASE_GAMES,
+  ...QUIZ_GAMES.map((q) => ({
+    key: q.key,
+    label: q.label,
+    emoji: q.emoji,
+    Component: makeQuizComponent(q.gen),
+  })),
 ];
 
 interface MiniGamesProps {
