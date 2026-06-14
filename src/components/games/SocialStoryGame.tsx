@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, ThumbsUp, ArrowRight } from "lucide-react";
+import { BookOpen, ThumbsUp, ArrowRight, Star } from "lucide-react";
 import { toast } from "sonner";
 
 const scenarios = [
@@ -10,7 +10,7 @@ const scenarios = [
     situation: "Your friend wants to play with your favorite toy. What should you do?",
     choices: [
       { text: "Share and take turns", isGood: true, feedback: "Great choice! Sharing makes everyone happy! 😊" },
-      { text: "Say no and keep it", isGood: false, feedback: "Let's think about how your friend feels. Try sharing!" },
+      { text: "Say no and keep it", isGood: false },
       { text: "Offer a different toy", isGood: true, feedback: "Good idea! You're being kind and thoughtful! 🌟" },
     ]
   },
@@ -19,7 +19,7 @@ const scenarios = [
     situation: "You feel angry because you lost a game. What's the best thing to do?",
     choices: [
       { text: "Take deep breaths", isGood: true, feedback: "Perfect! Breathing helps us calm down! 💙" },
-      { text: "Yell and throw things", isGood: false, feedback: "That might hurt someone. Let's find a calmer way!" },
+      { text: "Yell and throw things", isGood: false },
       { text: "Ask for a hug", isGood: true, feedback: "Wonderful! Asking for help is brave! 🤗" },
     ]
   },
@@ -28,7 +28,7 @@ const scenarios = [
     situation: "You see a new kid at school sitting alone. What could you do?",
     choices: [
       { text: "Say hello and introduce yourself", isGood: true, feedback: "Amazing! You're being so friendly! 🌈" },
-      { text: "Ignore them", isGood: false, feedback: "Everyone likes to have friends. Try being friendly!" },
+      { text: "Ignore them", isGood: false },
       { text: "Invite them to play", isGood: true, feedback: "You're so kind! That will make them feel happy! ⭐" },
     ]
   },
@@ -37,7 +37,7 @@ const scenarios = [
     situation: "Mom looks tired after work. What can you do to help?",
     choices: [
       { text: "Clean up your toys", isGood: true, feedback: "Excellent! You're being helpful and caring! 💚" },
-      { text: "Make more mess", isGood: false, feedback: "That would make things harder. Let's help instead!" },
+      { text: "Make more mess", isGood: false },
       { text: "Ask if she needs help", isGood: true, feedback: "So thoughtful! Asking is always good! 🌟" },
     ]
   },
@@ -47,21 +47,29 @@ const SocialStoryGame = () => {
   const [currentScenario, setCurrentScenario] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [score, setScore] = useState(0);
+  const [showFeedback, setShowFeedback] = useState<string | null>(null);
 
   const handleChoice = (index: number, isGood: boolean) => {
     setSelectedChoice(index);
-    const feedback = scenarios[currentScenario].choices[index].feedback;
-    
+    const choice = scenarios[currentScenario].choices[index];
+
     if (isGood) {
       setScore(score + 1);
-      toast.success(feedback);
+      setShowFeedback(choice.feedback ?? null);
+      toast.success(choice.feedback ?? "Great answer!");
     } else {
-      toast.info(feedback);
+      // Find correct answer(s) to show as positive guidance
+      const correctChoices = scenarios[currentScenario].choices.filter((c) => c.isGood);
+      const correctText = correctChoices.map((c) => c.text).join(" or ");
+      const betterMsg = `A better answer is: ${correctText}. You're learning! 💡`;
+      setShowFeedback(betterMsg);
+      toast.info(betterMsg);
     }
   };
 
   const nextScenario = () => {
     setSelectedChoice(null);
+    setShowFeedback(null);
     if (currentScenario < scenarios.length - 1) {
       setCurrentScenario(currentScenario + 1);
     } else {
@@ -101,19 +109,26 @@ const SocialStoryGame = () => {
                 selectedChoice === index
                   ? choice.isGood
                     ? "default"
-                    : "destructive"
+                    : "secondary"
                   : "outline"
               }
               className="w-full justify-start text-left h-auto py-3 px-4"
             >
               <span className="flex items-center gap-2">
                 {selectedChoice === index && choice.isGood && <ThumbsUp className="w-4 h-4" />}
+                {selectedChoice === index && !choice.isGood && <Star className="w-4 h-4" />}
                 {choice.text}
               </span>
             </Button>
           ))}
         </div>
       </div>
+
+      {selectedChoice !== null && showFeedback && (
+        <div className="mb-4 p-4 bg-white/60 rounded-lg text-center">
+          <p className="text-base font-medium text-foreground">{showFeedback}</p>
+        </div>
+      )}
 
       {selectedChoice !== null && (
         <div className="flex justify-center">
